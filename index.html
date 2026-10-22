@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f8ff">
+  <title>Clasificador de Arándanos | Dashboard IoT</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">🫐</div>
+        <div><strong>Nando ACkr</strong><span>MONITOREO IoT</span></div>
+      </div>
+      <nav aria-label="Navegación principal">
+        <a class="nav-item active" href="#inicio"><span>▦</span> Resumen</a>
+        <a class="nav-item" href="#graficos"><span>⌁</span> Gráficos</a>
+        <a class="nav-item" href="#historial"><span>◷</span> Historial</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="cloud-icon">☁</div>
+        <strong>ThingSpeak</strong>
+        <span>Canal <b id="side-channel">3545050</b></span>
+        <div class="connection"><i id="side-dot"></i><span id="side-status">Preparando conexión</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="inicio">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">PANEL DE CONTROL / IoT</p>
+          <h1>Clasificador de Arándanos</h1>
+          <p class="subtitle">Seguimiento de sensores y actuadores desde cualquier lugar.</p>
+        </div>
+        <div class="top-actions">
+          <span class="status-pill"><i id="status-dot"></i><span id="connection-status">Conectando</span></span>
+          <button id="refresh-btn" class="refresh-btn" type="button" title="Actualizar ahora">↻ <span>Actualizar</span></button>
+        </div>
+      </header>
+
+      <section class="welcome-card">
+        <div class="welcome-icon">✦</div>
+        <div><h2>Resumen del sistema</h2><p>Los indicadores se actualizan con los últimos registros disponibles en ThingSpeak.</p></div>
+        <div class="updated"><span>ÚLTIMA LECTURA</span><strong id="last-update">Esperando datos…</strong></div>
+      </section>
+
+      <section class="metrics-grid" aria-label="Indicadores principales">
+        <article class="metric-card distance-card">
+          <div class="metric-top"><span>Distancia</span><span class="metric-icon">↕</span></div>
+          <div class="metric-value"><span id="distance-value">—</span><small>cm</small></div>
+          <div class="metric-foot"><i class="blue-dot"></i><span id="distance-note">Sin lecturas todavía</span></div>
+        </article>
+        <article class="metric-card detect-card">
+          <div class="metric-top"><span>Objeto detectado</span><span class="metric-icon">◎</span></div>
+          <div class="metric-value compact" id="detected-value">—</div>
+          <div class="metric-foot"><i class="green-dot"></i><span id="detected-note">Esperando lectura</span></div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top"><span>LED rojo</span><span class="led-icon red">●</span></div>
+          <div class="metric-value compact" id="red-value">—</div>
+          <div class="metric-foot"><i class="red-dot"></i><span id="red-note">Estado desconocido</span></div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top"><span>LED verde</span><span class="led-icon green">●</span></div>
+          <div class="metric-value compact" id="green-value">—</div>
+          <div class="metric-foot"><i class="green-dot"></i><span id="green-note">Estado desconocido</span></div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top"><span>Servo</span><span class="servo-icon">⌘</span></div>
+          <div class="metric-value compact" id="servo-value">—</div>
+          <div class="metric-foot"><i class="purple-dot"></i><span id="servo-note">Estado desconocido</span></div>
+        </article>
+      </section>
+
+      <div id="notice" class="notice" role="status" hidden></div>
+
+      <section class="charts-grid" id="graficos">
+        <article class="panel distance-panel">
+          <div class="panel-heading"><div><h2>Evolución de distancia</h2><p>Últimas mediciones registradas</p></div><span class="chart-key"><i></i> Distancia (cm)</span></div>
+          <div class="chart-wrap"><canvas id="distance-chart" aria-label="Gráfico de distancia en el tiempo"></canvas></div>
+        </article>
+        <article class="panel detection-panel">
+          <div class="panel-heading"><div><h2>Detecciones</h2><p>Distribución de lecturas</p></div></div>
+          <div class="doughnut-wrap"><canvas id="detection-chart" aria-label="Gráfico de detecciones"></canvas><div class="doughnut-center"><strong id="detection-count">0</strong><span>detectados</span></div></div>
+          <div class="legend"><span><i class="legend-green"></i>Objeto detectado</span><span><i class="legend-gray"></i>Sin detección</span></div>
+        </article>
+      </section>
+
+      <section class="lower-grid">
+        <article class="panel" id="historial">
+          <div class="panel-heading"><div><h2>Últimas mediciones</h2><p>Datos recibidos desde ThingSpeak</p></div><span class="live-label"><i></i> ACTUALIZACIÓN AUTOMÁTICA</span></div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Hora</th><th>Distancia</th><th>Detección</th><th>LED rojo</th><th>LED verde</th><th>Servo</th></tr></thead>
+              <tbody id="history-body"><tr><td colspan="6" class="empty-cell">Esperando datos del canal…</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+        <aside class="panel system-panel">
+          <div class="panel-heading"><div><h2>Estado de conexión</h2><p>Fuente de datos</p></div></div>
+          <div class="system-row"><span class="system-logo">TS</span><div><strong>ThingSpeak</strong><span>Canal <b id="channel-number">3545050</b></span></div><span class="mini-state" id="mini-state">…</span></div>
+          <div class="system-detail"><span>Frecuencia de consulta</span><strong>20 segundos</strong></div>
+          <div class="system-detail"><span>Registros en pantalla</span><strong id="records-count">0</strong></div>
+          <a class="channel-link" href="https://thingspeak.com/channels/3545050" target="_blank" rel="noopener noreferrer">Abrir canal en ThingSpeak ↗</a>
+          <p class="privacy-note">Este dashboard muestra datos del canal configurado. Si el canal es público, cualquier persona puede consultar sus lecturas.</p>
+        </aside>
+      </section>
+      <footer><span>BerrySense · Dashboard IoT</span><span>Datos suministrados por ThingSpeak · Canal 3545050</span></footer>
+    </main>
+  </div>
+</body>
+</html>
